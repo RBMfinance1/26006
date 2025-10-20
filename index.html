@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compteur d'Exercices</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+
+        .setup-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 15px;
+        }
+
+        .setup-section label {
+            display: block;
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .setup-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .setup-section .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .setup-section .input-group label {
+            margin: 0;
+            flex: 1;
+            text-align: left;
+        }
+
+        .setup-section .input-group input {
+            flex: 1;
+            margin: 0;
+        }
+
+        .setup-section button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        .setup-section button:hover {
+            background: #5568d3;
+        }
+
+        .counter-section {
+            display: none;
+        }
+
+        .counter-section.active {
+            display: block;
+        }
+
+        .target-info {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .counter-display {
+            font-size: 80px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 30px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 18px;
+            flex: 1;
+        }
+
+        .btn-stop {
+            background: #ff6b6b;
+            color: white;
+            font-size: 18px;
+            flex: 1;
+        }
+
+        .btn-reset {
+            width: 100%;
+            background: #95a5a6;
+            color: white;
+            padding: 12px;
+            margin-top: 15px;
+        }
+
+        .completion-message {
+            display: none;
+            margin: 20px 0;
+            padding: 20px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .completion-message.show {
+            display: block;
+            animation: bounce 0.6s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💪 Compteur d'Exercices</h1>
+        <p class="subtitle">Suivez votre entraînement</p>
+
+        <!-- Section Configuration -->
+        <div class="setup-section" id="setupSection">
+            <label for="targetInput">Combien d'exercices voulez-vous faire ?</label>
+            <input 
+                type="number" 
+                id="targetInput" 
+                placeholder="Entrez un nombre"
+                min="1"
+                max="999"
+                value="10"
+            >
+            <button onclick="startCounter()">Commencer</button>
+        </div>
+
+        <!-- Section Compteur -->
+        <div class="counter-section" id="counterSection">
+            <div class="target-info">
+                Objectif : <span id="targetDisplay">0</span> exercices
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="counter-display" id="counterDisplay">0</div>
+
+            <div class="completion-message" id="completionMessage">
+                ✅ Bravo ! Objectif atteint !
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-start" id="btnStart" onclick="toggleCounter()">▶ Démarrer</button>
+                <button class="btn btn-stop" id="btnStop" onclick="stopCounter()" style="display: none;">⏹ Arrêter</button>
+            </div>
+
+            <button class="btn-reset" onclick="resetAll()">Réinitialiser</button>
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        let target = 10;
+        let isRunning = false;
+        let interval = null;
+
+        function startCounter() {
+            const input = document.getElementById('targetInput').value;
+            target = parseInt(input);
+
+            if (isNaN(target) || target < 1) {
+                alert('Veuillez entrer un nombre valide');
+                return;
+            }
+
+            count = 0;
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('counterSection').classList.add('active');
+            updateDisplay();
+        }
+
+        function toggleCounter() {
+            if (!isRunning) {
+                isRunning = true;
+                document.getElementById('btnStart').style.display = 'none';
+                document.getElementById('btnStop').style.display = 'block';
+                document.getElementById('completionMessage').classList.remove('show');
+
+                interval = setInterval(() => {
+                    if (count < target) {
+                        count++;
+                        updateDisplay();
+                        
+                        if (count >= target) {
+                            stopCounter();
+                            document.getElementById('completionMessage').classList.add('show');
+                        }
+                    }
+                }, 1000);
+            }
+        }
+
+        function stopCounter() {
+            isRunning = false;
+            clearInterval(interval);
+            document.getElementById('btnStart').style.display = 'block';
+            document.getElementById('btnStop').style.display = 'none';
+        }
+
+        function updateDisplay() {
+            document.getElementById('counterDisplay').textContent = count;
+            document.getElementById('targetDisplay').textContent = target;
+
+            const percentage = (count / target) * 100;
+            document.getElementById('progressFill').style.width = Math.min(percentage, 100) + '%';
+        }
+
+        function resetAll() {
+            stopCounter();
+            count = 0;
+            document.getElementById('setupSection').style.display = 'block';
+            document.getElementById('counterSection').classList.remove('active');
+            document.getElementById('completionMessage').classList.remove('show');
+            document.getElementById('targetInput').value = '10';
+        }
+    </script>
+</body>
+</html>
