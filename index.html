@@ -221,6 +221,18 @@
                 max="999"
                 value="10"
             >
+
+            <label for="speedInput">Temporisation entre chaque comptage (secondes)</label>
+            <input 
+                type="number" 
+                id="speedInput" 
+                placeholder="Entrez la durée"
+                min="0.1"
+                max="10"
+                step="0.1"
+                value="1"
+            >
+
             <button onclick="startCounter()">Commencer</button>
         </div>
 
@@ -252,15 +264,24 @@
     <script>
         let count = 0;
         let target = 10;
+        let speed = 1;
         let isRunning = false;
         let interval = null;
 
         function startCounter() {
             const input = document.getElementById('targetInput').value;
+            const speedInput = document.getElementById('speedInput').value;
+            
             target = parseInt(input);
+            speed = parseFloat(speedInput);
 
             if (isNaN(target) || target < 1) {
                 alert('Veuillez entrer un nombre valide');
+                return;
+            }
+
+            if (isNaN(speed) || speed < 0.1) {
+                alert('Veuillez entrer une temporisation valide');
                 return;
             }
 
@@ -287,7 +308,7 @@
                             document.getElementById('completionMessage').classList.add('show');
                         }
                     }
-                }, 1000);
+                }, speed * 1000);
             }
         }
 
@@ -313,6 +334,7 @@
             document.getElementById('counterSection').classList.remove('active');
             document.getElementById('completionMessage').classList.remove('show');
             document.getElementById('targetInput').value = '10';
+            document.getElementById('speedInput').value = '1';
         }
     </script>
 </body>
